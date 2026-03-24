@@ -4,6 +4,8 @@ MCP server for the [StressZero Intelligence API](https://stresszeroentrepreneur.
 
 The **only** burnout scoring MCP server available. Enable Claude, Cursor, Windsurf, n8n, and any MCP-compatible client to assess burnout risk in real-time conversations.
 
+[![stresszero-mcp MCP server](https://glama.ai/mcp/servers/gomessoaresemmanuel-cpu/stresszero-mcp/badges/card.svg)](https://glama.ai/mcp/servers/gomessoaresemmanuel-cpu/stresszero-mcp)
+
 ## Tools
 
 | Tool | Description |
