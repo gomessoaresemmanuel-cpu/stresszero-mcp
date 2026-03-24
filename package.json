@@ -1,0 +1,66 @@
+{
+  "name": "stresszero-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for StressZero Intelligence API — Burnout risk scoring for AI agents, coaches, and HR platforms",
+  "type": "module",
+  "bin": {
+    "stresszero-mcp": "./build/index.js"
+  },
+  "main": "./build/index.js",
+  "files": [
+    "build",
+    "README.md",
+    "LICENSE",
+    "smithery.yaml"
+  ],
+  "scripts": {
+    "build": "tsc && node -e \"const fs=require('fs'); const f='build/index.js'; const c=fs.readFileSync(f,'utf8'); if(!c.startsWith('#!')) fs.writeFileSync(f,'#!/usr/bin/env node\\n'+c);\"",
+    "dev": "tsc --watch",
+    "start": "node build/index.js",
+    "prepublishOnly": "npm run build",
+    "inspect": "npx @modelcontextprotocol/inspector node build/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "burnout",
+    "mental-health",
+    "wellness",
+    "hr",
+    "scoring",
+    "ai",
+    "llm",
+    "claude",
+    "anthropic",
+    "coaching",
+    "qvct",
+    "stresszero",
+    "api"
+  ],
+  "author": {
+    "name": "Emmanuel Gomes Soares",
+    "email": "hello@stresszeroentrepreneur.fr",
+    "url": "https://stresszeroentrepreneur.fr"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stresszero/stresszero-mcp"
+  },
+  "homepage": "https://stresszeroentrepreneur.fr/intelligence-api",
+  "bugs": {
+    "url": "https://github.com/stresszero/stresszero-mcp/issues"
+  }
+}

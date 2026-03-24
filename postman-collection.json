@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "StressZero Intelligence API",
+    "description": "Burnout risk scoring API — 3 dimensions (physical, emotional, effectiveness). Free tier: 500 calls/month.\n\nGet your API key: https://stresszeroentrepreneur.fr/intelligence-api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{STRESSZERO_API_KEY}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://stresszeroentrepreneur.fr"
+    },
+    {
+      "key": "STRESSZERO_API_KEY",
+      "value": "sz_live_your_key_here"
+    }
+  ],
+  "item": [
+    {
+      "name": "Analyze Burnout",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"responses\": [\n    {\"dimension\": \"physical\", \"question_id\": \"sleep\", \"value\": 40, \"weight\": 3},\n    {\"dimension\": \"physical\", \"question_id\": \"energy\", \"value\": 50, \"weight\": 2},\n    {\"dimension\": \"emotional\", \"question_id\": \"motivation\", \"value\": 55, \"weight\": 2},\n    {\"dimension\": \"emotional\", \"question_id\": \"stress\", \"value\": 30, \"weight\": 3},\n    {\"dimension\": \"effectiveness\", \"question_id\": \"productivity\", \"value\": 35, \"weight\": 2},\n    {\"dimension\": \"effectiveness\", \"question_id\": \"focus\", \"value\": 45, \"weight\": 1}\n  ],\n  \"context\": {\n    \"profession\": \"entrepreneur\",\n    \"hours_per_week\": 60\n  },\n  \"options\": {\n    \"language\": \"fr\",\n    \"include_recommendations\": true,\n    \"include_dimensions\": true\n  }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/analyze-burnout",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "analyze-burnout"]
+        },
+        "description": "Score burnout risk across 3 dimensions. Returns score (0-100), risk level, factors, urgency, and recommendations.\n\nAll tiers have access."
+      }
+    },
+    {
+      "name": "Generate Report (Starter+)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"responses\": [\n    {\"dimension\": \"physical\", \"question_id\": \"sleep\", \"value\": 40, \"weight\": 3},\n    {\"dimension\": \"emotional\", \"question_id\": \"motivation\", \"value\": 55, \"weight\": 2},\n    {\"dimension\": \"effectiveness\", \"question_id\": \"productivity\", \"value\": 35, \"weight\": 2}\n  ],\n  \"context\": {\n    \"profession\": \"entrepreneur\",\n    \"hours_per_week\": 60,\n    \"company_name\": \"My Company\",\n    \"employee_name\": \"John Doe\"\n  },\n  \"language\": \"fr\",\n  \"format\": \"json\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/generate-report",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "generate-report"]
+        },
+        "description": "Generate a detailed burnout report with action plans and resource recommendations.\n\nRequires Starter tier or above (29€/month)."
+      }
+    },
+    {
+      "name": "Create Free API Key",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": { "type": "noauth" },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test@example.com\",\n  \"name\": \"My Wellness App\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/keys",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "keys"]
+        },
+        "description": "Create a free API key (500 calls/month). No authentication required.\n\nThe key is shown once only — save it immediately."
+      }
+    },
+    {
+      "name": "OpenAPI Specification",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": { "type": "noauth" },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/openapi",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "openapi"]
+        },
+        "description": "Complete OpenAPI 3.1 specification. No authentication required."
+      }
+    },
+    {
+      "name": "Quick Burnout Check (minimal)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"responses\": [\n    {\"dimension\": \"physical\", \"question_id\": \"overall\", \"value\": 40, \"weight\": 2},\n    {\"dimension\": \"emotional\", \"question_id\": \"overall\", \"value\": 55, \"weight\": 2},\n    {\"dimension\": \"effectiveness\", \"question_id\": \"overall\", \"value\": 35, \"weight\": 2}\n  ],\n  \"options\": {\"language\": \"fr\", \"include_recommendations\": true}\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/analyze-burnout",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "analyze-burnout"]
+        },
+        "description": "Quick 3-score burnout check with minimal data. Good for chatbots and triage."
+      }
+    }
+  ]
+}
