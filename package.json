@@ -1,7 +1,8 @@
 {
   "name": "stresszero-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for StressZero Intelligence API — Burnout risk scoring for AI agents, coaches, and HR platforms",
+  "version": "1.1.0",
+  "mcpName": "io.github.gomessoaresemmanuel-cpu/stresszero-mcp",
+  "description": "MCP server for StressZero Intelligence API — burnout prevention self-assessment (non-medical) for AI agents, coaches, and HR platforms",
   "type": "module",
   "bin": {
     "stresszero-mcp": "./build/index.js"
@@ -57,10 +58,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/stresszero/stresszero-mcp"
+    "url": "https://github.com/gomessoaresemmanuel-cpu/stresszero-mcp"
   },
   "homepage": "https://stresszeroentrepreneur.fr/intelligence-api",
   "bugs": {
-    "url": "https://github.com/stresszero/stresszero-mcp/issues"
+    "url": "https://github.com/gomessoaresemmanuel-cpu/stresszero-mcp/issues"
   }
 }

@@ -1,16 +1,18 @@
 # StressZero MCP Server
 
-MCP server for the [StressZero Intelligence API](https://stresszeroentrepreneur.fr/intelligence-api) — Score burnout risk across 3 dimensions with AI agents.
+MCP server for the [StressZero Intelligence API](https://stresszeroentrepreneur.fr/intelligence-api) — burnout prevention **self-assessment** for AI agents, across 3 dimensions (physical, emotional, effectiveness).
 
-The **only** burnout scoring MCP server available. Enable Claude, Cursor, Windsurf, n8n, and any MCP-compatible client to assess burnout risk in real-time conversations.
+Enable Claude, Cursor, Windsurf, n8n, and any MCP-compatible client to help users self-assess their workload signals in real-time conversations.
+
+> ⚠️ **Not a medical device.** All scores are indicative, based on self-reported answers. This server provides no diagnosis, no screening, and no clinical triage. Persistent exhaustion warrants a doctor — the tools say so in their outputs.
 
 ## Tools
 
 | Tool | Description |
 |------|-------------|
-| `analyze_burnout` | Score burnout risk across physical, emotional, and effectiveness dimensions. Returns score, risk level, factors, and recommendations. |
-| `generate_burnout_report` | Generate a detailed burnout assessment report with action plans. Requires Starter+ tier. |
-| `quick_burnout_check` | Simplified 3-score burnout screening for chatbots and triage. |
+| `analyze_burnout` | Self-assessed burnout signals across physical, emotional, and effectiveness dimensions. Returns an indicative score, level, contributing factors, and prevention recommendations. |
+| `generate_burnout_report` | Generate a detailed self-assessment report with action plans. Requires Starter+ tier. |
+| `quick_burnout_check` | Simplified 3-score self-check for chatbots and quick conversations. |
 | `get_stresszero_api_key` | Create a free API key (500 calls/month) for a user. |
 
 ## Resources
@@ -113,22 +115,16 @@ Claude will automatically call `quick_burnout_check` and return your score with 
 
 ## Use Cases
 
-- **AI coaching assistant** — Score burnout in real-time during conversations
-- **HR AI agent** — Detect team burnout risk in employee check-ins
-- **Wellness chatbot** — Triage users based on burnout severity
-- **n8n automation** — Trigger alerts when burnout score exceeds threshold
-- **Productivity tool** — Monitor user wellbeing and suggest breaks
+- **AI coaching assistant** — Help users self-assess their workload in real-time during conversations
+- **HR AI agent** — Aggregated, anonymized team load signals only (individual scores are never exposed to employers)
+- **Wellness chatbot** — Suggest next steps based on self-reported load, including seeing a doctor when signals persist
+- **n8n automation** — Trigger prevention workflows when a self-assessed score crosses a threshold
+- **Productivity tool** — Monitor self-reported wellbeing and suggest breaks
 
 ## API Tiers
 
-| Tier | Price | Calls/month | Rate limit |
-|------|-------|-------------|------------|
-| Free | 0€ | 500 | 10/min |
-| Starter | 29€/mo | 5,000 | 30/min |
-| Pro | 99€/mo | 25,000 | 60/min |
-| Enterprise | 299€/mo | 100,000 | 120/min |
-
-[Get your API key](https://stresszeroentrepreneur.fr/intelligence-api)
+Free tier: **500 calls/month**, no credit card. Current paid tiers and pricing:
+[stresszeroentrepreneur.fr/intelligence-api](https://stresszeroentrepreneur.fr/intelligence-api)
 
 ## Environment Variables
 

@@ -5,7 +5,7 @@
  *
  * Exposes the StressZero Intelligence API as MCP tools for AI agents.
  * Enables Claude, Cursor, Windsurf, n8n, and any MCP-compatible client
- * to score burnout risk, generate reports, and manage API keys.
+ * to run burnout prevention self-assessments (non-medical), generate reports, and manage API keys.
  *
  * @author Emmanuel Gomes Soares <hello@stresszeroentrepreneur.fr>
  * @see https://stresszeroentrepreneur.fr/intelligence-api
@@ -68,7 +68,7 @@ async function apiRequest<T>(
       headers: {
         Authorization: `Bearer ${STRESSZERO_API_KEY}`,
         "Content-Type": "application/json",
-        "User-Agent": "stresszero-mcp/1.0.0",
+        "User-Agent": "stresszero-mcp/1.1.0",
         ...options.headers,
       },
     });
@@ -132,7 +132,7 @@ const ContextSchema = z.object({
 const server = new McpServer(
   {
     name: "stresszero-mcp",
-    version: "1.0.0",
+    version: "1.1.0",
   },
   {
     capabilities: { logging: {} },
@@ -146,11 +146,12 @@ const server = new McpServer(
 server.registerTool(
   "analyze_burnout",
   {
-    title: "Analyze Burnout Risk",
+    title: "Analyze Burnout Signals (self-assessment)",
     description:
-      "Score burnout risk across 3 dimensions (physical, emotional, effectiveness). " +
-      "Returns a 0-100 total score, risk level (low/moderate/high/critical), " +
-      "risk factors, urgency rating, and personalized recommendations. " +
+      "Self-assessed burnout signals across 3 dimensions (physical, emotional, effectiveness). " +
+      "Returns an indicative 0-100 score, level (low/moderate/high/critical), " +
+      "contributing factors, urgency rating, and prevention recommendations. " +
+      "Not a medical device: no diagnosis — persistent exhaustion warrants a doctor. " +
       "Requires 3-20 response items covering at least the 3 dimensions. " +
       "Free tier: 500 calls/month. All tiers have access.",
     inputSchema: {
@@ -301,11 +302,11 @@ server.registerTool(
 server.registerTool(
   "quick_burnout_check",
   {
-    title: "Quick Burnout Check",
+    title: "Quick Burnout Self-Check",
     description:
-      "Simplified burnout screening with just 3 scores (one per dimension). " +
-      "Perfect for quick assessments in conversations, chatbots, or triage. " +
-      "Internally calls analyze_burnout with sensible defaults.",
+      "Simplified self-check with just 3 self-reported scores (one per dimension). " +
+      "Perfect for quick, indicative check-ins in conversations and chatbots. " +
+      "Not a diagnosis or clinical triage. Internally calls analyze_burnout with sensible defaults.",
     inputSchema: {
       physical_score: z.number().min(0).max(100).describe(
         "Physical wellbeing score 0-100 (sleep quality, energy, health). Low = burnout risk.",
@@ -403,7 +404,7 @@ server.registerTool(
   {
     title: "Get Free API Key",
     description:
-      "Create a free StressZero API key (500 calls/month). " +
+      "Create a free StressZero API key (100 calls/month). " +
       "Use this to help users get started with the API. " +
       "The key is returned once and cannot be retrieved later. " +
       "Requires a valid email address.",
@@ -455,7 +456,7 @@ server.registerTool(
             "API Key created successfully!",
             "",
             `Key: ${data?.api_key ?? "N/A"}`,
-            `Tier: Free (500 calls/month)`,
+            `Tier: Free (100 calls/month)`,
             "",
             "IMPORTANT: Save this key now — it will NOT be shown again.",
             "",
@@ -464,6 +465,132 @@ server.registerTool(
         },
       ],
     };
+  },
+);
+
+// ============================================================
+// TOOL 5: analyze_team
+// ============================================================
+
+server.registerTool(
+  "analyze_team",
+  {
+    title: "Analyze Team Burnout",
+    description:
+      "Analyze burnout risk across a team (2-500 members). " +
+      "Returns aggregated metrics (avg, min, max, std dev), risk distribution, " +
+      "department breakdown, alerts, and recommendations. " +
+      "Each member counts as 1 API call. Requires Starter+ tier.",
+    inputSchema: {
+      team_name: z.string().max(200).optional().describe("Team name for the report"),
+      members: z.array(z.object({
+        member_id: z.string().max(100).optional().describe("Member identifier (anonymized if option set)"),
+        responses: z.array(ResponseItemSchema).min(3).max(20),
+        context: z.object({
+          role: z.string().max(100).optional(),
+          department: z.string().max(100).optional(),
+          hours_per_week: z.number().min(0).max(120).optional(),
+        }).optional(),
+      })).min(2).max(50).describe("Team members with their burnout responses (2-50 for MCP, API supports up to 500)"),
+      anonymize: z.boolean().default(true).optional().describe("Anonymize member IDs in response"),
+      language: z.enum(["fr", "en"]).default("fr").optional(),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: true },
+  },
+  async ({ team_name, members, anonymize, language }) => {
+    const result = await apiRequest("/api/v1/analyze-team", {
+      method: "POST",
+      body: JSON.stringify({
+        team_name,
+        members,
+        options: { anonymize: anonymize ?? true, include_distribution: true, include_department_breakdown: true, language: language ?? "fr" },
+      }),
+    });
+
+    if (!result.success) {
+      const hint = result.error?.status === 403
+        ? "\n\nThis endpoint requires Starter tier or above. Upgrade at: https://stresszeroentrepreneur.fr/intelligence-api#pricing"
+        : "";
+      return { isError: true, content: [{ type: "text" as const, text: `Team analysis failed: ${result.error?.message}${hint}` }] };
+    }
+
+    return { content: [{ type: "text" as const, text: JSON.stringify(result.data, null, 2) }] };
+  },
+);
+
+// ============================================================
+// TOOL 6: predict_burnout
+// ============================================================
+
+server.registerTool(
+  "predict_burnout",
+  {
+    title: "Predict Burnout Trajectory (J+30)",
+    description:
+      "Predict burnout evolution over 7, 14, and 30 days based on current scores and lifestyle context. " +
+      "Returns trajectory (improving/stable/worsening/critical_acceleration), " +
+      "risk factors with impact scores, and intervention urgency with days-to-critical estimate.",
+    inputSchema: {
+      responses: z.array(ResponseItemSchema).min(3).max(20).describe("Current burnout responses"),
+      context: ContextSchema,
+      predictive_context: z.object({
+        has_support_network: z.boolean().optional().describe("Does the person have a support network?"),
+        has_morning_routine: z.boolean().optional().describe("Does the person have a morning routine?"),
+        exercise_days_per_week: z.number().min(0).max(7).optional().describe("Days of exercise per week"),
+        sleep_hours: z.number().min(0).max(24).optional().describe("Average sleep hours per night"),
+      }).optional().describe("Lifestyle context for prediction accuracy"),
+      previous_scores: z.array(z.object({
+        physical: z.number().min(0).max(100),
+        emotional: z.number().min(0).max(100),
+        effectiveness: z.number().min(0).max(100),
+        measured_at: z.string().describe("ISO date of measurement"),
+      })).max(10).optional().describe("Historical scores for trend detection"),
+      language: z.enum(["fr", "en"]).default("fr").optional(),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: true },
+  },
+  async ({ responses, context, predictive_context, previous_scores, language }) => {
+    const result = await apiRequest("/api/v1/analyze-burnout", {
+      method: "POST",
+      body: JSON.stringify({
+        responses,
+        context,
+        predictive_context,
+        previous_scores,
+        options: { include_prediction: true, include_recommendations: true, include_dimensions: true, language: language ?? "fr" },
+      }),
+    });
+
+    if (!result.success) {
+      return { isError: true, content: [{ type: "text" as const, text: `Prediction failed: ${result.error?.message}` }] };
+    }
+
+    return { content: [{ type: "text" as const, text: JSON.stringify(result.data, null, 2) }] };
+  },
+);
+
+// ============================================================
+// TOOL 7: check_health
+// ============================================================
+
+server.registerTool(
+  "check_stresszero_health",
+  {
+    title: "Check API Health",
+    description: "Check the StressZero API health status including database connectivity and rate limiter. No authentication required.",
+    inputSchema: {},
+    annotations: { readOnlyHint: true, openWorldHint: true },
+  },
+  async () => {
+    const result = await apiRequest("/api/v1/health");
+
+    if (!result.success) {
+      return { isError: true, content: [{ type: "text" as const, text: `Health check failed: ${result.error?.message}` }] };
+    }
+
+    // result for health endpoint returns top-level (not wrapped in data)
+    const data = result.data || result;
+    return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
   },
 );
 
@@ -581,7 +708,7 @@ async function main() {
   await server.connect(transport);
   console.error("StressZero MCP server running on stdio");
   console.error(`API: ${API_BASE_URL}`);
-  console.error("Tools: analyze_burnout, generate_burnout_report, quick_burnout_check, get_stresszero_api_key");
+  console.error("Tools: analyze_burnout, generate_burnout_report, quick_burnout_check, get_stresszero_api_key, analyze_team, predict_burnout, check_stresszero_health");
 }
 
 main().catch((error) => {
