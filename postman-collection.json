@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "StressZero Intelligence API",
-    "description": "Burnout risk scoring API — 3 dimensions (physical, emotional, effectiveness). Free tier: 500 calls/month.\n\nGet your API key: https://stresszeroentrepreneur.fr/intelligence-api",
+    "description": "Burnout prevention self-assessment API (non-medical) — 3 dimensions (physical, emotional, effectiveness). Free tier: 500 calls/month.\n\nGet your API key: https://stresszeroentrepreneur.fr/intelligence-api",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -109,7 +109,7 @@
           "host": ["{{baseUrl}}"],
           "path": ["api", "v1", "analyze-burnout"]
         },
-        "description": "Quick 3-score burnout check with minimal data. Good for chatbots and triage."
+        "description": "Quick 3-score burnout check with minimal data. Good for chatbots and quick self-checks."
       }
     }
   ]

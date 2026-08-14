@@ -1,5 +1,5 @@
 name: stresszero-mcp
-description: "MCP server for StressZero Intelligence API — Score burnout risk across 3 dimensions (physical, emotional, effectiveness) with AI agents"
+description: "MCP server for StressZero Intelligence API — Burnout prevention self-assessment across 3 dimensions (physical, emotional, effectiveness) — indicative, non-medical"
 startCommand:
   type: stdio
   configSchema:
