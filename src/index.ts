@@ -469,107 +469,6 @@ server.registerTool(
 );
 
 // ============================================================
-// TOOL 5: analyze_team
-// ============================================================
-
-server.registerTool(
-  "analyze_team",
-  {
-    title: "Analyze Team Burnout",
-    description:
-      "Analyze burnout risk across a team (2-500 members). " +
-      "Returns aggregated metrics (avg, min, max, std dev), risk distribution, " +
-      "department breakdown, alerts, and recommendations. " +
-      "Each member counts as 1 API call. Requires Starter+ tier.",
-    inputSchema: {
-      team_name: z.string().max(200).optional().describe("Team name for the report"),
-      members: z.array(z.object({
-        member_id: z.string().max(100).optional().describe("Member identifier (anonymized if option set)"),
-        responses: z.array(ResponseItemSchema).min(3).max(20),
-        context: z.object({
-          role: z.string().max(100).optional(),
-          department: z.string().max(100).optional(),
-          hours_per_week: z.number().min(0).max(120).optional(),
-        }).optional(),
-      })).min(2).max(50).describe("Team members with their burnout responses (2-50 for MCP, API supports up to 500)"),
-      anonymize: z.boolean().default(true).optional().describe("Anonymize member IDs in response"),
-      language: z.enum(["fr", "en"]).default("fr").optional(),
-    },
-    annotations: { readOnlyHint: true, openWorldHint: true },
-  },
-  async ({ team_name, members, anonymize, language }) => {
-    const result = await apiRequest("/api/v1/analyze-team", {
-      method: "POST",
-      body: JSON.stringify({
-        team_name,
-        members,
-        options: { anonymize: anonymize ?? true, include_distribution: true, include_department_breakdown: true, language: language ?? "fr" },
-      }),
-    });
-
-    if (!result.success) {
-      const hint = result.error?.status === 403
-        ? "\n\nThis endpoint requires Starter tier or above. Upgrade at: https://stresszeroentrepreneur.fr/intelligence-api#pricing"
-        : "";
-      return { isError: true, content: [{ type: "text" as const, text: `Team analysis failed: ${result.error?.message}${hint}` }] };
-    }
-
-    return { content: [{ type: "text" as const, text: JSON.stringify(result.data, null, 2) }] };
-  },
-);
-
-// ============================================================
-// TOOL 6: predict_burnout
-// ============================================================
-
-server.registerTool(
-  "predict_burnout",
-  {
-    title: "Predict Burnout Trajectory (J+30)",
-    description:
-      "Predict burnout evolution over 7, 14, and 30 days based on current scores and lifestyle context. " +
-      "Returns trajectory (improving/stable/worsening/critical_acceleration), " +
-      "risk factors with impact scores, and intervention urgency with days-to-critical estimate.",
-    inputSchema: {
-      responses: z.array(ResponseItemSchema).min(3).max(20).describe("Current burnout responses"),
-      context: ContextSchema,
-      predictive_context: z.object({
-        has_support_network: z.boolean().optional().describe("Does the person have a support network?"),
-        has_morning_routine: z.boolean().optional().describe("Does the person have a morning routine?"),
-        exercise_days_per_week: z.number().min(0).max(7).optional().describe("Days of exercise per week"),
-        sleep_hours: z.number().min(0).max(24).optional().describe("Average sleep hours per night"),
-      }).optional().describe("Lifestyle context for prediction accuracy"),
-      previous_scores: z.array(z.object({
-        physical: z.number().min(0).max(100),
-        emotional: z.number().min(0).max(100),
-        effectiveness: z.number().min(0).max(100),
-        measured_at: z.string().describe("ISO date of measurement"),
-      })).max(10).optional().describe("Historical scores for trend detection"),
-      language: z.enum(["fr", "en"]).default("fr").optional(),
-    },
-    annotations: { readOnlyHint: true, openWorldHint: true },
-  },
-  async ({ responses, context, predictive_context, previous_scores, language }) => {
-    const result = await apiRequest("/api/v1/analyze-burnout", {
-      method: "POST",
-      body: JSON.stringify({
-        responses,
-        context,
-        predictive_context,
-        previous_scores,
-        options: { include_prediction: true, include_recommendations: true, include_dimensions: true, language: language ?? "fr" },
-      }),
-    });
-
-    if (!result.success) {
-      return { isError: true, content: [{ type: "text" as const, text: `Prediction failed: ${result.error?.message}` }] };
-    }
-
-    return { content: [{ type: "text" as const, text: JSON.stringify(result.data, null, 2) }] };
-  },
-);
-
-// ============================================================
 // TOOL 7: check_health
 // ============================================================
 
@@ -708,7 +607,7 @@ async function main() {
   await server.connect(transport);
   console.error("StressZero MCP server running on stdio");
   console.error(`API: ${API_BASE_URL}`);
-  console.error("Tools: analyze_burnout, generate_burnout_report, quick_burnout_check, get_stresszero_api_key, analyze_team, predict_burnout, check_stresszero_health");
+  console.error("Tools: analyze_burnout, generate_burnout_report, quick_burnout_check, get_stresszero_api_key, check_stresszero_health");
 }
 
 main().catch((error) => {
