@@ -1,20 +1,12 @@
 name: stresszero-mcp
-description: "MCP server for StressZero Intelligence API — Burnout prevention self-assessment across 3 dimensions (physical, emotional, effectiveness) — indicative, non-medical"
+description: "Qualitative workload reflection and StressZero public frame — no scoring, diagnosis, prediction or triage"
 startCommand:
   type: stdio
   configSchema:
     type: object
-    properties:
-      apiKey:
-        type: string
-        description: "Your StressZero API key (get free at stresszeroentrepreneur.fr/intelligence-api)"
-    required:
-      - apiKey
+    properties: {}
   commandFunction: |-
-    (config) => ({
+    () => ({
       command: "npx",
-      args: ["-y", "stresszero-mcp"],
-      env: {
-        STRESSZERO_API_KEY: config.apiKey
-      }
+      args: ["-y", "stresszero-mcp"]
     })
