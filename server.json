@@ -3,13 +3,13 @@
   "name": "io.github.gomessoaresemmanuel-cpu/stresszero-mcp",
   "description": "Burnout prevention self-assessment across 3 dimensions (physical, emotional, effectiveness) — indicative, non-medical",
   "title": "StressZero MCP - Burnout Prevention Self-Assessment",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "stresszero-mcp",
-      "version": "1.0.1",
+      "version": "1.2.0",
       "transport": {
         "type": "stdio"
       },

@@ -68,7 +68,7 @@ async function apiRequest<T>(
       headers: {
         Authorization: `Bearer ${STRESSZERO_API_KEY}`,
         "Content-Type": "application/json",
-        "User-Agent": "stresszero-mcp/1.1.0",
+        "User-Agent": "stresszero-mcp/1.2.0",
         ...options.headers,
       },
     });
@@ -132,7 +132,7 @@ const ContextSchema = z.object({
 const server = new McpServer(
   {
     name: "stresszero-mcp",
-    version: "1.1.0",
+    version: "1.2.0",
   },
   {
     capabilities: { logging: {} },
